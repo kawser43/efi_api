@@ -13,10 +13,42 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->bigInteger('record_id')->nullable();
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone')->nullable()->comment('Phone Number');
+            $table->string('whatsapp_phone_number')->nullable()->comment('WhatsApp phone number');
+            $table->date('date_of_birth')->nullable();
+            $table->string('gender')->nullable();
+            $table->date('become_investor_at')->nullable()->comment('Became a Customer Date (Fixed) ');
+            $table->date('close_date')->nullable();
+            $table->date('days_to_close')->nullable();
+            $table->boolean('is_unworked')->default(false)->comment('Contact unworked');
+            $table->string('kyc_status')->nullable()->comment('nameScanKYCResult');
+            $table->string('kyc_staus_em')->nullable();
+            $table->string('kyc_staus_ex')->nullable();
+            $table->string('entity')->nullable();
+            $table->string('investor_type')->nullable()->comment('Type of Investor ');
+            $table->string('membership_type')->nullable()->comment('Type of Membership (EM: New from Laravel)');
+            $table->string('currency')->nullable();
+            $table->string('contact_owner')->nullable()->comment('Contact Owner');
+            $table->string('email_preference')->nullable()->comment('Email Preference');
+
+            $table->string('ethis_eg')->nullable();
+            $table->string('ethis_global')->nullable();
+            $table->string('ethis_my_investor')->nullable()->comment('Ethis_MY Investor');
+            $table->string('ethis_ae')->nullable();
+            $table->string('ethis_id')->nullable();
+            $table->string('ethis_my')->nullable();
+            $table->string('ethis_x')->nullable();
+            $table->string('gs')->nullable();
+            $table->datetime('last_engaged_at')->nullable()->comment('Last Engagement Date');
+            $table->datetime('last_activity')->nullable()->comment('Last Activity Date');
+            $table->datetime('last_modified_at')->nullable()->comment('Last Modified Date');
+            $table->string('updated_by')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
