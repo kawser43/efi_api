@@ -42,8 +42,6 @@ return new class extends Migration
             $table->string('new_email')->nullable()->comment('New email');
             $table->boolean('t_and_c')->nullable()->comment('T&C');
 
-            $table->string('passport_country')->nullable()->comment('Country of Passport (for KYC: New Aug 21)');
-            $table->string('passport_country_no_us_israel')->nullable()->comment('Country of Passport - Less US/Israel');
             $table->string('passport_number')->nullable()->comment('Passport Number');
             $table->date('passport_expiry_date')->nullable()->comment('Passport Expiry Date');
 
