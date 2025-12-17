@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Row;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
 {
@@ -21,11 +22,12 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
             return null;
         }
 
-        $becomeInvestorAt = Carbon::canBeCreatedFromFormat('Y-m-d', trim($row['became_a_customer_date_fixed'] ?? '')) ? Carbon::createFromFormat('Y-m-d', trim($row['became_a_customer_date_fixed'])) : null;
-        $closeDate = Carbon::canBeCreatedFromFormat('Y-m-d', trim($row['close_date'] ?? '')) ? Carbon::createFromFormat('Y-m-d', trim($row['close_date'])) : null;
-        $lastEngagementDate = Carbon::canBeCreatedFromFormat('Y-m-d H:i', trim($row['last_engagement_date'] ?? '')) ? Carbon::createFromFormat('Y-m-d H:i', trim($row['last_engagement_date'])) : null;
-        $lastModifiedDate = Carbon::canBeCreatedFromFormat('Y-m-d H:i', trim($row['last_modified_at'] ?? '')) ? Carbon::createFromFormat('Y-m-d H:i', trim($row['last_modified_at'])) : null;
-        $lastActivityDate = Carbon::canBeCreatedFromFormat('Y-m-d H:i', trim($row['last_activity_date'] ?? '')) ? Carbon::createFromFormat('Y-m-d H:i', trim($row['last_activity_date'])) : null;
+        $lastEngagementDate = $this->excelDateToCarbon(trim($row['last_engagement_date'] ?? ''));
+        $lastActivityDate = $this->excelDateToCarbon(trim($row['last_activity_date'] ?? ''));
+        $becomeInvestorAt = $this->excelDateToCarbon(trim($row['became_a_customer_date_fixed'] ?? ''));
+        $closeDate = $this->excelDateToCarbon(trim($row['close_date'] ?? ''));
+        $lastModifiedDate = $this->excelDateToCarbon(trim($row['last_modified_date'] ?? ''));
+        $createDate = $this->excelDateToCarbon(trim($row['create_date'] ?? ''));
 
         Log::info('Excel User Row', $row);
 
@@ -42,7 +44,7 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
             'gender' => trim($row['gender'] ?? ''),
             'become_investor_at' => $becomeInvestorAt,
             'close_date' => $closeDate,
-            'days_to_close' => trim($row['days_to_close'] ?? ''),
+            'days_to_close' => is_numeric(trim($row['days_to_close'] ?? '')) ? trim($row['days_to_close']) : null,
             'is_unworked' => $this->getBooleanValue(trim($row['contact_unworked'] ?? '')),
             'kyc_status' => trim($row['namescankycresult'] ?? ''),
             'kyc_staus_em' => trim($row['kyc_check_result_em'] ?? ''),
@@ -66,13 +68,14 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
             'last_activity' => $lastActivityDate,
             'last_modified_at' => $lastModifiedDate,
             'updated_by' => trim($row['updated_by_user_id'] ?? ''),
+            'create_date' => $createDate
         ]);
 
     }
 
     public function chunkSize(): int
     {
-        return 5;
+        return 200;
     }
 
     private function getBooleanValue($value): int
@@ -83,6 +86,28 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
 
         return 0;
     }
+
+    private function excelDateToCarbon($value): ?Carbon
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        // If it's numeric → Excel serial date
+        if (is_numeric($value)) {
+            return Carbon::instance(
+                ExcelDate::excelToDateTimeObject($value)
+            );
+        }
+
+        // If it's string → try normal parsing
+        try {
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 
 
 }

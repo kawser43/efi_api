@@ -50,6 +50,7 @@ return new class extends Migration
             $table->datetime('last_modified_at')->nullable()->comment('Last Modified Date');
             $table->string('updated_by')->nullable();
             $table->rememberToken();
+            $table->dateTime('create_date')->nullable()->comment('Create Date from Excel');
             $table->timestamps();
         });
 

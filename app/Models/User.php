@@ -54,6 +54,7 @@ class User extends Authenticatable
         'last_activity',
         'last_modified_at',
         'updated_by',
+        'create_date'
     ];
 
     /**
