@@ -28,7 +28,6 @@ return new class extends Migration
             $table->string('name_of_employer')->nullable()->comment('Name of employer or nature of self-employment / nature of business');
             $table->string('occupation')->nullable();
             $table->string('place_of_incorporation')->nullable();
-            $table->string('place_of_incorporation')->nullable();
             $table->string('company_domain')->nullable();
             $table->string('company_owner')->nullable();
             $table->timestamps();

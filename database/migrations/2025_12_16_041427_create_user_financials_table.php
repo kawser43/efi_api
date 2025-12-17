@@ -41,7 +41,6 @@ return new class extends Migration
             $table->float('total_investment_in_delayed_projects')->nullable();
             $table->float('total_payout_for_ethis_fund_idr')->nullable();
             $table->float('total_payout_for_ethis_fund_usd')->nullable();
-            $table->float('total_payout_for_ethis_fund_usd')->nullable();
 
             $table->float('annual_revenue')->nullable();
 

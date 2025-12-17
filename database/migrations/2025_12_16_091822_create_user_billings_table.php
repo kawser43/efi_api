@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('billing_address')->nullable()->comment('Billing Address Line 1');
             $table->string('billing_city')->nullable()->comment('Billing City');
-            $table->string('billing_city')->nullable()->comment('Billing City');
             $table->string('billing_country')->nullable()->comment('Billing Country');
             $table->string('billing_state')->nullable()->comment('Billing State');
             $table->string('account_country')->nullable();
