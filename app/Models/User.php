@@ -18,9 +18,42 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'record_id',
+        'first_name',
+        'last_name',
         'email',
+        'email_verified_at',
         'password',
+        'phone',
+        'whatsapp_phone_number',
+        'date_of_birth',
+        'gender',
+        'become_investor_at',
+        'close_date',
+        'days_to_close',
+        'is_unworked',
+        'kyc_status',
+        'kyc_staus_em',
+        'kyc_staus_ex',
+        'entity',
+        'investor_type',
+        'membership_type',
+        'currency',
+        'contact_owner',
+        'email_preference',
+
+        'ethis_eg',
+        'ethis_global',
+        'ethis_my_investor',
+        'ethis_ae',
+        'ethis_id',
+        'ethis_my',
+        'ethis_x',
+        'gs',
+        'last_engaged_at',
+        'last_activity',
+        'last_modified_at',
+        'updated_by',
     ];
 
     /**

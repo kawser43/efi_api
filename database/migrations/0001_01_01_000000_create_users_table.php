@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('gender')->nullable();
             $table->date('become_investor_at')->nullable()->comment('Became a Customer Date (Fixed) ');
             $table->date('close_date')->nullable();
-            $table->date('days_to_close')->nullable();
+            $table->integer('days_to_close')->nullable();
             $table->boolean('is_unworked')->default(false)->comment('Contact unworked');
             $table->string('kyc_status')->nullable()->comment('nameScanKYCResult');
             $table->string('kyc_staus_em')->nullable();
