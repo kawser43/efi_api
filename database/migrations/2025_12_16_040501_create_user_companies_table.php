@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('country_of_registration')->nullable();
             $table->string('registration_number')->nullable()->comment('Company Registration Number');
             $table->date('incorporation_date')->nullable()->comment('Incorporation Date');
-            $table->string('incorporation_certificate')->nullable()->comment('Company Incorporation Certificate');
+            $table->text('incorporation_certificate')->nullable()->comment('Company Incorporation Certificate');
             $table->boolean('company_investor_declaration')->nullable()->comment('Declaration for Company Investors ');
             $table->string('business_type')->nullable();
             $table->string('designation')->nullable();

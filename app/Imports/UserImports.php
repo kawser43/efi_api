@@ -28,8 +28,7 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
         $closeDate = $this->excelDateToCarbon(trim($row['close_date'] ?? ''));
         $lastModifiedDate = $this->excelDateToCarbon(trim($row['last_modified_date'] ?? ''));
         $createDate = $this->excelDateToCarbon(trim($row['create_date'] ?? ''));
-
-        Log::info('Excel User Row', $row);
+        $dob = $this->excelDateToCarbon(trim($row['date_of_birth'] ?? ''));
 
         User::create([
             'record_id' => trim($row['record_id_contact'] ?? ''),
@@ -40,7 +39,7 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
             'password' => Hash::make('12345678'),
             'phone' => trim($row['phone_number'] ?? ''),
             'whatsapp_phone_number' => trim($row['whats_app_number'] ?? ''),
-            //'date_of_birth' => trim($row['date_of_birth'] ?? ''),
+            'date_of_birth' => $dob,
             'gender' => trim($row['gender'] ?? ''),
             'become_investor_at' => $becomeInvestorAt,
             'close_date' => $closeDate,
@@ -51,7 +50,7 @@ class UserImports implements OnEachRow, WithHeadingRow, WithChunkReading
             'kyc_staus_ex' => trim($row['kyc_check_result_ex'] ?? ''),
             'entity' => trim($row['entity'] ?? ''),
             'investor_type' => trim($row['type_of_investor'] ?? ''),
-            'membership_type' => trim($row['type_of_membership_em_new_from_laravel)'] ?? ''),
+            'membership_type' => trim($row['type_of_membership_em_new_from_laravel'] ?? ''),
             'currency' => trim($row['currency'] ?? ''),
             'contact_owner' => trim($row['contact_owner'] ?? ''),
             'email_preference' => trim($row['email_preference'] ?? ''),

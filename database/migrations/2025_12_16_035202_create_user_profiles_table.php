@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->string('city')->nullable();
             $table->string('city_2')->nullable();
-            $table->string('state')->nullable()->comment('State/Region');
+            $table->string('state')->nullable()->comment('state_region');
             $table->string('country')->nullable()->comment('Country/Region');
             $table->string('country_2')->nullable()->comment('Country/Region');
             $table->string('nationality')->nullable();
@@ -36,7 +37,7 @@ return new class extends Migration
             $table->string('postal_code')->nullable()->comment('Postal Code');
             $table->text('address_verification_proof')->nullable()->comment('Address Verification Proof');
 
-            $table->string('about_you')->nullable()->comment('About you');
+            $table->text('about_you')->nullable()->comment('About you');
             $table->date('customer_date')->nullable()->comment('Customer Date');
             $table->string('swap_investment_to')->nullable()->comment('I want to swap my investment from CSI to');
             $table->string('new_email')->nullable()->comment('New email');
@@ -51,7 +52,7 @@ return new class extends Migration
             $table->dateTime('kyc_verified_at')->nullable()->comment('KYC Verified Date');
             $table->dateTime('kyc_checked_at')->nullable()->comment('KYC Check (Date)');
             $table->string('rejection_reason')->nullable()->comment('KYC Rejection Reason');
-            $table->string('id_passport_proof')->nullable()->comment('ID passport (File)');
+            $table->text('id_passport_proof')->nullable()->comment('ID passport (File)');
             $table->string('industry')->nullable();
             $table->string('job_title')->nullable();
 

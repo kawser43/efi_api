@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('meta_key')->comment('uncontrolled column key in excel sheet');
-            $table->string('meta_value');
+            $table->text('meta_value');
             $table->timestamps();
         });
     }
