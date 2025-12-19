@@ -25,13 +25,38 @@ class ProjectPropertyImports implements OnEachRow, WithHeadingRow, WithChunkRead
             return null;
         }
 
-        Log::info('===Property===', $row);
+        $projectCommencement = $this->excelDateToCarbon(trim($row['project_commencement'] ?? ''));
+        $dueDate = $this->excelDateToCarbon(trim($row['due_date'] ?? ''));
+        $payoutDate = $this->excelDateToCarbon(trim($row['payout_date'] ?? ''));
+        $paymentDate = $this->excelDateToCarbon(trim($row['payment_date'] ?? ''));
 
-//        $customerDate = $this->excelDateToCarbon(trim($row['customer_date'] ?? ''));
+        Campaign::updateOrCreate(
+            [
+                'project_name' => trim($row['project_name'], ''),
+            ],
+            [
+            'number_of_transactions' => trim($row['number_of_transactions'], ''),
+            'crowdfunded_amount_sgd' => trim($row['crowdfunded_amount_sgd'], ''),
+            'crowdfunded_amount_idr' => trim($row['crowdfunded_amount_idr'], ''),
+            'project_commencement' => $projectCommencement,
+            'projected_roi_percentage' => trim($row['projected_roi_percentage'], ''),
+            'actual_roi_percentage' => trim($row['actual_roi_percentage'], ''),
 
-       /* Campaign::create([
-            'city' => trim($row['city'] ?? ''),
-        ]);*/
+            'due_date' => $dueDate,
+            'payout_date' => $payoutDate,
+            'payment_status' => trim($row['payment_status'], ''),
+            'payout_status_percentage' => trim($row['payout_status_percentage'], ''),
+            'project_status' => trim($row['project_status'], ''),
+            'actual_payout_idr' => trim($row['actual_payout_idr'], ''),
+            'agency_fee_idr' => trim($row['agency_fee_idr'], ''),
+            'tax_idr' => trim($row['tax_idr'], ''),
+            'withdrawn_idr' => trim($row['withdrawn_idr'], ''),
+            'reinvested_idr' => trim($row['reinvested_idr'], ''),
+            'available_idr' => trim($row['available_idr'], ''),
+            'payout_process' => trim($row['payout_process'], ''),
+            'payment_date' => $paymentDate,
+            'remarks' => trim($row['remarks'], ''),
+        ]);
     }
 
     public function chunkSize(): int
