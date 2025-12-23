@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Campaign extends Model
 {
@@ -12,6 +13,8 @@ class Campaign extends Model
         'crowdfunded_amount_sgd',
         'crowdfunded_amount_idr',
         'project_commencement',
+        'projected_roi',
+        'actual_roi',
         'projected_roi_percentage',
         'actual_roi_percentage',
         'due_date',
@@ -29,4 +32,12 @@ class Campaign extends Model
         'payment_date',
         'remarks',
     ];
+
+    /**
+     * Relationship
+     */
+    public function campaignPaymentDates(): HasMany
+    {
+        return $this->hasMany(CampaignPaymentDate::class, 'campaign_id');
+    }
 }

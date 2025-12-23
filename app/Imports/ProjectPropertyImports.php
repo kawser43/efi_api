@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Campaign;
+use App\Models\CampaignPaymentDate;
 use App\Models\User;
 use App\Models\UserBilling;
 use App\Models\UserProfile;
@@ -25,43 +26,62 @@ class ProjectPropertyImports implements OnEachRow, WithHeadingRow, WithChunkRead
             return null;
         }
 
+        Log::info('Campaign:', $row);
+
         $projectCommencement = $this->excelDateToCarbon(trim($row['project_commencement'] ?? ''));
         $dueDate = $this->excelDateToCarbon(trim($row['due_date'] ?? ''));
-        $payoutDate = $this->excelDateToCarbon(trim($row['payout_date'] ?? ''));
-        $paymentDate = $this->excelDateToCarbon(trim($row['payment_date'] ?? ''));
+        //$payoutDate = $this->excelDateToCarbon(trim($row['payout_date'] ?? ''));
+        $paymentDateValue = $this->getAvailableAttrValue(['payout_date', 'payment_date_by_the_issuer', 'payment_date'], $row);
+        $paymentDate = $this->excelDateToCarbon(trim($paymentDateValue ?? ''));
 
-        Campaign::updateOrCreate(
-            [
-                'project_name' => trim($row['project_name'], ''),
-            ],
-            [
-            'number_of_transactions' => trim($row['number_of_transactions'], ''),
-            'crowdfunded_amount_sgd' => trim($row['crowdfunded_amount_sgd'], ''),
-            'crowdfunded_amount_idr' => trim($row['crowdfunded_amount_idr'], ''),
-            'project_commencement' => $projectCommencement,
-            'projected_roi_percentage' => trim($row['projected_roi_percentage'], ''),
-            'actual_roi_percentage' => trim($row['actual_roi_percentage'], ''),
+        $campaign = Campaign::where(['project_name' => trim($row['project_name'])])->firstOrNew();
 
-            'due_date' => $dueDate,
-            'payout_date' => $payoutDate,
-            'payment_status' => trim($row['payment_status'], ''),
-            'payout_status_percentage' => trim($row['payout_status_percentage'], ''),
-            'project_status' => trim($row['project_status'], ''),
-            'actual_payout_idr' => trim($row['actual_payout_idr'], ''),
-            'agency_fee_idr' => trim($row['agency_fee_idr'], ''),
-            'tax_idr' => trim($row['tax_idr'], ''),
-            'withdrawn_idr' => trim($row['withdrawn_idr'], ''),
-            'reinvested_idr' => trim($row['reinvested_idr'], ''),
-            'available_idr' => trim($row['available_idr'], ''),
-            'payout_process' => trim($row['payout_process'], ''),
-            'payment_date' => $paymentDate,
-            'remarks' => trim($row['remarks'], ''),
-        ]);
+        if(!$campaign->id) {
+            $campaign->project_name = trim($row['project_name'], '');
+            $campaign->number_of_transactions = isset($row['total_transactions']) ? $this->getNumericValue(trim($row['total_transactions'], '')) : null;
+            $campaign->crowdfunded_amount_sgd = isset($row['crowdfunded_amount_sgd']) ? $this->getNumericValue(trim($row['crowdfunded_amount_sgd'], '')) : null;
+            $campaign->crowdfunded_amount_idr = isset($row['crowdfunded_amount_idr']) ? $this->getNumericValue(trim($row['crowdfunded_amount_idr'], '')) : null;
+            $campaign->project_commencement = $projectCommencement;
+            $campaign->projected_roi = isset($row['projected_roi']) ? trim($row['projected_roi'], '') ?? null : null;
+            $campaign->actual_roi = isset($row['actual_roi']) ? trim($row['actual_roi'], '') ?? null : null;
+            //'projected_roi_percentage' => trim($row['projected_roi_percentage'], ''),
+            //'actual_roi_percentage' => trim($row['actual_roi_percentage'], ''),
+            $campaign->due_date = $dueDate;
+            //'payout_date' => $payoutDate,
+            $campaign->payment_status = trim($this->getAvailableAttrValue( ['payment_status'], $row) ?? '') ?? null;
+            $campaign->payout_status_percentage = (isset($row['payout_status']) ? $this->getNumericValue(trim($row['payout_status'], '')) : 0) * 100;
+            $campaign->project_status = isset($row['project_status']) ? trim($row['project_status'], '') : null;
+            $campaign->actual_payout_idr = isset($row['actual_payout_idr']) ? $this->getNumericValue(trim($row['actual_payout_idr'], '')) : 0;
+            $campaign->agency_fee_idr = isset($row['agency_fee_idr']) ? $this->getNumericValue(trim($row['agency_fee_idr'], '')) : 0;
+            $campaign->tax_idr = isset($row['tax_idr']) ? $this->getNumericValue(trim($row['tax_idr'], '')) : 0;
+            $campaign->withdrawn_idr = isset($row['withdrawn_idr']) ? $this->getNumericValue(trim($row['withdrawn_idr'], '')) : 0;
+            $campaign->reinvested_idr = isset($row['reinvested_idr']) ? $this->getNumericValue(trim($row['reinvested_idr'], '')) : 0;
+            //$campaign->available_idr = isset($row['available_idr']) ? $this->getNumericValue(trim($row['available_idr'], '')) : 0; //This is formula
+            //$campaign->payout_process = isset($row['payout_process']) ? trim($row['payout_process'], '') : null; //This is formula
+            //'payment_date' => $paymentDate,
+            //$campaign->remarks = isset($row['remarks']) ? trim($row['remarks'], '') : null; //This is formula
+
+            $campaign->save();
+            $campaign->refresh();
+        }
+        CampaignPaymentDate::create(['campaign_id' => $campaign->id ,'payment_date' => $paymentDate]);
     }
 
     public function chunkSize(): int
     {
         return 200;
+    }
+
+    private function getAvailableAttrValue($attributes, $array)
+    {
+        foreach ($attributes as $attribute) {
+            if (isset($array[$attribute]) && $array[$attribute]) {
+                return $array[$attribute];
+                break;
+            }
+        }
+
+        return "";
     }
 
     private function getBooleanValue($value): int
@@ -71,6 +91,15 @@ class ProjectPropertyImports implements OnEachRow, WithHeadingRow, WithChunkRead
         if(strtoupper($value) === 'YES') return 1;
 
         return 0;
+    }
+
+    private function getNumericValue($value)
+    {
+        if(empty($value)) return 0;
+
+        if(!is_numeric($value)) return 0;
+
+        return $value;
     }
 
     private function excelDateToCarbon($value): ?Carbon

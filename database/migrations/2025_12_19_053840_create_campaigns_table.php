@@ -18,11 +18,13 @@ return new class extends Migration
             $table->float('crowdfunded_amount_sgd')->nullable();
             $table->float('crowdfunded_amount_idr')->nullable();
             $table->date('project_commencement')->nullable();
+            $table->string('projected_roi')->nullable();
+            $table->string('actual_roi')->nullable();
             $table->float('projected_roi_percentage')->nullable();
             $table->float('actual_roi_percentage')->nullable();
 
             $table->date('due_date')->nullable();
-            $table->date('payout_date')->nullable();
+            $table->text('payout_date')->nullable();
             $table->string('payment_status')->nullable();
             $table->float('payout_status_percentage')->nullable();
             $table->string('project_status')->nullable();

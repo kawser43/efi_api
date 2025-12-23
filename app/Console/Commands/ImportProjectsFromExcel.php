@@ -14,7 +14,7 @@ class ImportProjectsFromExcel extends Command
      *
      * @var string
      */
-    protected $signature = 'import:projects';
+    protected $signature = 'import:projects {type? : Import type (property, 2021, 2022)}';
 
     /**
      * The console command description.
@@ -23,12 +23,19 @@ class ImportProjectsFromExcel extends Command
      */
     protected $description = 'Import Projects data from Excel file';
 
+    private array $filePaths = [
+        'property' => 'app/public/excel/project_property.xlsx',
+        '2021' => 'app/public/excel/project_2021.xlsx',
+        '2022' => 'app/public/excel/project_2022.xlsx',
+    ];
+
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $filePath = storage_path('app/public/excel/project_list.xlsx');
+        $arg = $this->argument('type') ?? 'property';
+        $filePath = storage_path($this->filePaths[$arg]);
 
         if(!file_exists($filePath)){
             $this->error('File not found');
