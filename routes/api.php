@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\InvestorController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
@@ -15,10 +16,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
     /** ###########################
-     *  ########### Campaigns ##########
+     *  ########### Reports ##########
      *  ###########################
      */
     Route::get('campaigns', [CampaignController::class, 'campaignList']);
+    Route::get('investors', [InvestorController::class, 'investorList']);
 
 
 });
