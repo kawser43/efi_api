@@ -225,9 +225,9 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         ),
         'phpDocumentor\\Reflection\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
+            0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
         ),
         'ZipStream\\' => 
         array (
@@ -670,7 +670,13 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Console\\Commands\\ImportProjectsFromExcel' => __DIR__ . '/../..' . '/app/Console/Commands/ImportProjectsFromExcel.php',
         'App\\Console\\Commands\\ImportUsersFromExcel' => __DIR__ . '/../..' . '/app/Console/Commands/ImportUsersFromExcel.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
+        'App\\Http\\Controllers\\CampaignController' => __DIR__ . '/../..' . '/app/Http/Controllers/CampaignController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\InvestorController' => __DIR__ . '/../..' . '/app/Http/Controllers/InvestorController.php',
+        'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
+        'App\\Http\\Resources\\CampaignResource' => __DIR__ . '/../..' . '/app/Http/Resources/CampaignResource.php',
+        'App\\Http\\Resources\\InvestorDetailResource' => __DIR__ . '/../..' . '/app/Http/Resources/InvestorDetailResource.php',
+        'App\\Http\\Resources\\InvestorResource' => __DIR__ . '/../..' . '/app/Http/Resources/InvestorResource.php',
         'App\\Imports\\ProjectPropertyImports' => __DIR__ . '/../..' . '/app/Imports/ProjectPropertyImports.php',
         'App\\Imports\\UserBillingImports' => __DIR__ . '/../..' . '/app/Imports/UserBillingImports.php',
         'App\\Imports\\UserCompanyImports' => __DIR__ . '/../..' . '/app/Imports/UserCompanyImports.php',
@@ -691,6 +697,8 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Models\\UserMeta' => __DIR__ . '/../..' . '/app/Models/UserMeta.php',
         'App\\Models\\UserProfile' => __DIR__ . '/../..' . '/app/Models/UserProfile.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
+        'App\\Services\\CampaignService' => __DIR__ . '/../..' . '/app/Services/CampaignService.php',
+        'App\\Services\\InvestorService' => __DIR__ . '/../..' . '/app/Services/InvestorService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
         'Brick\\Math\\BigInteger' => __DIR__ . '/..' . '/brick/math/src/BigInteger.php',

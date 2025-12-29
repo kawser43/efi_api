@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,30 +12,23 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            // Relationship to the users table
-            $table->unsignedBigInteger('user_id')->comment('Mapped from Associated Contact IDs');
+            $table->unsignedBigInteger('payout_id');
+            $table->float('capital')->nullable();
+            $table->float('tax')->nullable();
+            $table->float('partial')->nullable();
+            $table->float('profit')->nullable();
+            $table->float('available_amount_after_tax')->nullable();
+            $table->float('payout_actual')->nullable();
+            $table->string('currency')->default('idr');
 
-            // Deal Identifiers
-            $table->bigInteger('deal_record_id')->nullable()->comment('Record ID from Deals sheet');
-            $table->string('deal_name')->nullable();
-            $table->string('pipeline')->nullable();
-            $table->string('deal_stage')->nullable();
-
-            // Financial Data
-            $table->decimal('amount_sgd', 18, 4)->nullable();
-            $table->decimal('amount_idr', 18, 4)->nullable();
-            $table->decimal('profit_idr', 18, 4)->nullable();
-            $table->decimal('weighted_amount', 18, 4)->nullable();
-            $table->decimal('weighted_amount_company_currency', 18, 4)->nullable();
-
-            // Metadata & Classification
-            $table->string('transaction_type')->default('incoming')->comment('incoming (fund) or outgoing (payout)');
-            $table->string('investor_name_at_transaction')->nullable()->comment('Name of the Investor from deals sheet');
-            $table->string('investor_nationality_at_transaction')->nullable()->comment('Nationality from deals sheet');
-
-            // Dates
-            $table->dateTime('deal_close_at')->nullable()->comment('Close Date');
-            $table->dateTime('deal_created_at')->nullable()->comment('Create Date');
+            $table->float('payout_actual_transfer')->nullable();
+            $table->string('transfer_currency')->nullable();
+            $table->float('exchange_rate')->nullable();
+            $table->string('payout_status')->nullable();
+            $table->string('purpose')->nullable();
+            $table->date('payout_date')->nullable();
+            $table->string('platform')->nullable();
+            $table->string('investment_status')->nullable();
 
             $table->timestamps();
         });
