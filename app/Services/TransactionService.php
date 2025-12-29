@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Campaign;
 use App\Models\User;
 
-class InvestorService
+class TransactionService
 {
-    public function getInvestorsPaginated()
+    public function getTransactionsPaginated()
     {
         $queryParams = request()->query('search');
         return User::where(function($query) use ($queryParams) {
@@ -15,16 +14,5 @@ class InvestorService
                 $query->whereRaw("CONCAT(first_name, ' ', last_name) like '%" . $queryParams . "%'");
             }
         })->paginate(20);
-    }
-
-    public function getInvestorDetail($id)
-    {
-        return User::with([
-            'userBilling',
-            'userProfile',
-            'userCompany',
-            'userFinancial',
-            'userMeta',
-        ])->find($id);
     }
 }

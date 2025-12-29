@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\InvestorDetailResource;
 use App\Http\Resources\InvestorResource;
 use App\Services\InvestorService;
 use Illuminate\Http\Request;
@@ -13,18 +14,31 @@ class InvestorController extends Controller
     }
     public function investorList()
     {
-        $campaigns = $this->investorService->getInvestorsPaginated();
+        $investors = $this->investorService->getInvestorsPaginated();
 
-        if ($campaigns->isEmpty()) {
-            return $this->errorResponse(message: 'No campaigns found.');
+        if ($investors->isEmpty()) {
+            return $this->errorResponse(message: 'No Investor found.');
         }
 
         $data = [
-            'data' => InvestorResource::collection($campaigns->items()),
-            'per_page' => $campaigns->perPage(),
-            'total' => $campaigns->total()
+            'data' => InvestorResource::collection($investors->items()),
+            'per_page' => $investors->perPage(),
+            'total' => $investors->total()
         ];
 
-        return $this->successResponse(message: 'Success! Campaign list.', data: $data);
+        return $this->successResponse(message: 'Success! Investor list.', data: $data);
+    }
+
+    public function investorDetail(int $id)
+    {
+        $investor = $this->investorService->getInvestorDetail($id);
+
+        if (!$investor) {
+            return $this->errorResponse(message: 'Investor not found.');
+        }
+
+        $data = new InvestorDetailResource($investor);
+
+        return $this->successResponse(message: 'Success! Investor Detail.', data: $data);
     }
 }
