@@ -24,7 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('investors', [InvestorController::class, 'investorList']);
     Route::get('investors/{id}', [InvestorController::class, 'investorDetail'])->where('id', '[0-9]+');
 
-
+    /**
+     * Transactions
+     */
+    Route::get('deals', [TransactionController::class, 'dealList']);
     Route::get('transactions', [TransactionController::class, 'transactionList']);
     Route::post('transactions', [TransactionController::class, 'transactionSave']);
 

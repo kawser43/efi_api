@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Imports\ProjectImports;
 use App\Imports\ProjectPropertyImports;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
