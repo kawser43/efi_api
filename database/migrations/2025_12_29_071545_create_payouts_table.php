@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('payouts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('deal_id')->nullable();
             $table->unsignedBigInteger('campaign_id')->nullable();
             $table->tinyInteger('reinvestment_status')->default(0);
@@ -32,6 +32,8 @@ return new class extends Migration {
             $table->float('remaining_profit_after_tax_idr')->nullable()->comment('');
             $table->float('total_return_after_tax_idr')->nullable()->comment('');
             $table->float('actual_roi_after_tax_percentage')->nullable()->comment('');
+
+            $table->timestamps();
         });
     }
 

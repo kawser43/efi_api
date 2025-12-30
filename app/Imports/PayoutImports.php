@@ -4,6 +4,8 @@ namespace App\Imports;
 
 use App\Models\Campaign;
 use App\Models\CampaignPaymentDate;
+use App\Models\Payout;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserBilling;
 use App\Models\UserProfile;
@@ -25,45 +27,95 @@ class PayoutImports implements OnEachRow, WithHeadingRow, WithChunkReading
     {
         $row = $row->toArray();
 
-        if (empty($row['deal_id'])) {
+        if (empty($row['project_name'])) {
             return null;
         }
 
-        Log::info('Transaction:', $row);
+//        Log::info('Payout:', $row);
 
-        return null;
+        $email = trim($row['email'] ?? '');
 
-//        $projectCommencement = $this->excelDateToCarbon(trim($row['project_commencement'] ?? ''));
-//        $dueDate = $this->excelDateToCarbon(trim($row['due_date'] ?? ''));
-//        $paymentDateValue = $this->getAvailableAttrValue(['payout_date', 'payment_date_by_the_issuer', 'payment_date'], $row);
-//        $paymentDate = $this->excelDateToCarbon(trim($paymentDateValue ?? ''));
+        $user = empty($email) ? null : User::where('email', $row['email'])->first();
 
-        $campaign = Campaign::where(['project_name' => trim($row['project_name'])])->firstOrNew();
-
-        if (!$campaign->id) {
-            $campaign->project_name = trim($row['project_name'], '');
-            $campaign->number_of_transactions = isset($row['total_transactions']) ? $this->getNumericValue(trim($row['total_transactions'], '')) : null;
-            $campaign->crowdfunded_amount_sgd = isset($row['crowdfunded_amount_sgd']) ? $this->getNumericValue(trim($row['crowdfunded_amount_sgd'], '')) : null;
-            $campaign->crowdfunded_amount_idr = isset($row['crowdfunded_amount_idr']) ? $this->getNumericValue(trim($row['crowdfunded_amount_idr'], '')) : null;
-            $campaign->project_commencement = $projectCommencement;
-            $campaign->projected_roi = isset($row['projected_roi']) ? trim($row['projected_roi'], '') ?? null : null;
-            $campaign->actual_roi = isset($row['actual_roi']) ? trim($row['actual_roi'], '') ?? null : null;
-            $campaign->payment_status = trim($this->getAvailableAttrValue(['payment_status'], $row) ?? '') ?? null;
-            $campaign->payout_status_percentage = (isset($row['payout_status']) ? $this->getNumericValue(trim($row['payout_status'], '')) : 0) * 100;
-            $campaign->project_status = isset($row['project_status']) ? trim($row['project_status'], '') : null;
-            $campaign->actual_payout_idr = isset($row['actual_payout_idr']) ? $this->getNumericValue(trim($row['actual_payout_idr'], '')) : 0;
-            $campaign->agency_fee_idr = isset($row['agency_fee_idr']) ? $this->getNumericValue(trim($row['agency_fee_idr'], '')) : 0;
-            $campaign->tax_idr = isset($row['tax_idr']) ? $this->getNumericValue(trim($row['tax_idr'], '')) : 0;
-            $campaign->withdrawn_idr = isset($row['withdrawn_idr']) ? $this->getNumericValue(trim($row['withdrawn_idr'], '')) : 0;
-            $campaign->reinvested_idr = isset($row['reinvested_idr']) ? $this->getNumericValue(trim($row['reinvested_idr'], '')) : 0;
-            //$campaign->payout_process = isset($row['payout_process']) ? trim($row['payout_process'], '') : null; //This is formula
-            //'payment_date' => $paymentDate,
-            //$campaign->remarks = isset($row['remarks']) ? trim($row['remarks'], '') : null; //This is formula
-
-            $campaign->save();
-            $campaign->refresh();
+        $userID = null;
+        if($user) {
+            $userID = $user->id;
         }
-        CampaignPaymentDate::create(['campaign_id' => $campaign->id, 'payment_date' => $paymentDate]);
+
+
+        $transactionDate = $this->excelDateToCarbon(trim($row['date'] ?? ''));
+
+        $payout = Payout::create([
+            'user_id' => $userID,
+            'deal_id' => $this->getNumericValue(trim($row['deal_id'] ?? '')),
+            'campaign_id' => $this->getNumericValue(trim($row['project_id'] ?? '')),
+            'reinvestment_status' => $this->getBooleanValue(trim($row['reinvest'] ?? '')),
+            'transaction_date' => $transactionDate,
+            'invested_amount_sgd' => $this->getNumericValue(trim($row['capital_invested_sgd'] ?? '')),
+            'invested_amount_idr' => $this->getNumericValue(trim($row['capital_received_idr'] ?? '')),
+            'roi_percentage' => $this->getNumericValue(trim($row['roi'] ?? '')) * 100,
+            'profit_margin_idr' => $this->getNumericValue(trim($row['profit_margin_idr'] ?? '')),
+            'estimated_tax_idr' => $this->getNumericValue(trim($row['estimated_tax'] ?? '')),
+            'profit_margin_after_tax_idr' => $this->getNumericValue(trim($row['profit_margin_after_tax_idr'] ?? '')),
+            'agency_fee_percentage' => $this->getNumericValue(trim($row['agency_fee'] ?? '')) * 100,
+            'agency_fee_idr' => $this->getNumericValue(trim($row['agency_fee_idr'] ?? '')),
+            'estimated_payout_before_tax_idr' => $this->getNumericValue(trim($row['estimated_payout_before_tax_90_capital_idr'] ?? '')),
+            'estimated_payout_after_tax_idr' => $this->getNumericValue(trim($row['estimated_payout_after_tax_idr'] ?? '')),
+            'estimated_payout_after_tax_and_agency_fee_idr' => $this->getNumericValue(trim($row['estimated_payout_after_tax_agency_fee_idr'] ?? '')),
+            'remaining_capital_idr' => $this->getNumericValue(trim($row['remaining_capital'] ?? '')),
+            'remaining_profit_after_tax_idr' => $this->getNumericValue(trim($row['remaining_profit_after_tax'] ?? '')),
+            'total_return_after_tax_idr' => $this->getNumericValue(trim($row['total_return_after_tax'] ?? '')),
+            'actual_roi_after_tax_percentage' => $this->getNumericValue(trim($row['actual_roi_after_tax'] ?? '')) * 100,
+        ]);
+
+        $payout->refresh();
+
+        $this->saveTransactions($payout, $row);
+
+    }
+
+    private function saveTransactions($payout, $row)
+    {
+        $payoutDate1 = $this->excelDateToCarbon(trim($row['1st_payout_date'] ?? ''));
+        $payoutDate2 = $this->excelDateToCarbon(trim($row['2nd_payout_date'] ?? ''));
+
+        $firstPartialPayout = new Transaction([
+            'capital' => $this->getNumericValue(trim($row['1st_capital_idr'] ?? '')),
+            'tax' => $this->getBooleanValue(trim($row['1st_tax_idr'] ?? '')),
+            'partial' => $this->getNumericValue(trim($row['1st_partial_idr'] ?? '')),
+            'profit' => $this->getNumericValue(trim($row['1st_profit_idr'] ?? '')),
+            'available_amount_after_tax' => $this->getNumericValue(trim($row['1st_available_amount_after_tax_idr'] ?? '')),
+            'payout_actual' => $this->getNumericValue(trim($row['1st_payout_actual_idr'] ?? '')),
+            'currency' => "IDR",
+            'payout_actual_transfer' => $this->getNumericValue(trim($row['1st_payout_actual'] ?? '')),
+            'transfer_currency' => strtoupper(trim($row['1st_payout_currency'] ?? '')),
+            'exchange_rate' => $this->getNumericValue(trim($row['1st_exchange_rate'] ?? '')),
+            'payout_status' => trim($row['1st_payout_status'] ?? ''),
+            'purpose' => trim($row['1st_purpose'] ?? ''),
+            'payout_date' => $payoutDate1,
+            'platform' => trim($row['1st_platform'] ?? ''),
+            'investment_status' => trim($row['1st_investment_status'] ?? ''),
+        ]);
+
+        $secondPartialPayout = new Transaction([
+            'capital' => $this->getNumericValue(trim($row['2nd_capital_idr'] ?? '')),
+            'tax' => $this->getBooleanValue(trim($row['2nd_tax_idr'] ?? '')),
+            'partial' => $this->getNumericValue(trim($row['2nd_partial_idr'] ?? '')),
+            'profit' => $this->getNumericValue(trim($row['2nd_profit_idr'] ?? '')),
+            'available_amount_after_tax' => $this->getNumericValue(trim($row['2nd_available_amount_after_tax_idr'] ?? '')),
+            'payout_actual' => $this->getNumericValue(trim($row['2nd_payout_actual_idr'] ?? '')),
+            'currency' => "IDR",
+            'payout_actual_transfer' => $this->getNumericValue(trim($row['2nd_payout_actual'] ?? '')),
+            'transfer_currency' => strtoupper(trim($row['2nd_payout_currency'] ?? '')),
+            'exchange_rate' => $this->getNumericValue(trim($row['2nd_exchange_rate'] ?? '')),
+            'payout_status' => trim($row['2nd_payout_status'] ?? ''),
+            'purpose' => trim($row['2nd_purpose'] ?? ''),
+            'payout_date' => $payoutDate2,
+            'platform' => trim($row['2nd_platform'] ?? ''),
+            'investment_status' => trim($row['2nd_investment_status'] ?? ''),
+        ]);
+
+        $payout->transactions()->saveMany([$firstPartialPayout, $secondPartialPayout]);
     }
 
     public function chunkSize(): int

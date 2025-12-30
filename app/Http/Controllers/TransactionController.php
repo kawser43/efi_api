@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DealResource;
 use App\Http\Resources\InvestorDetailResource;
 use App\Http\Resources\InvestorResource;
+use App\Http\Resources\PayoutResource;
 use App\Services\InvestorService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
@@ -33,16 +34,16 @@ class TransactionController extends Controller
         return $this->successResponse(message: 'Success! Deal list.', data: $data);
     }
 
-    public function transactionList()
+    public function payoutList()
     {
-        $investors = $this->transactionService->getTransactionsPaginated();
+        $investors = $this->transactionService->getPayoutsPaginated();
 
         if ($investors->isEmpty()) {
             return $this->errorResponse(message: 'No transaction found.');
         }
 
         $data = [
-            'data' => InvestorResource::collection($investors->items()),
+            'data' => PayoutResource::collection($investors->items()),
             'per_page' => $investors->perPage(),
             'total' => $investors->total()
         ];

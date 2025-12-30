@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Deal;
+use App\Models\Payout;
 
 class TransactionService
 {
@@ -15,12 +16,12 @@ class TransactionService
             }
         })->paginate(20);
     }
-    public function getTransactionsPaginated()
+    public function getPayoutsPaginated()
     {
         $queryParams = request()->query('search');
-        return Deal::where(function($query) use ($queryParams) {
+        return Payout::with(['transactions', 'campaign', 'user'])->where(function($query) use ($queryParams) {
             if($queryParams) {
-                $query->whereRaw("CONCAT(first_name, ' ', last_name) like '%" . $queryParams . "%'");
+                $query->where("deal_id", $queryParams);
             }
         })->paginate(20);
     }
