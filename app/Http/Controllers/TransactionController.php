@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PayoutRequest;
 use App\Http\Resources\DealResource;
 use App\Http\Resources\InvestorDetailResource;
 use App\Http\Resources\InvestorResource;
@@ -65,8 +66,14 @@ class TransactionController extends Controller
         return $this->successResponse(message: 'Success! Transaction list.', data: $data);
     }
 
-    public function transactionSave()
+    public function payoutSave(PayoutRequest $request, int $id)
     {
-        //
+        $payout = $this->transactionService->savePayout($request->validated(), $id);
+
+        if(!$payout){
+            return $this->errorResponse(message: 'Failed! Payout cannot be saved.');
+        }
+
+        return $this->successResponse(message: 'Success! Payout saved.');
     }
 }

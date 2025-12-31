@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transaction extends Model
 {
@@ -23,4 +24,13 @@ class Transaction extends Model
         'platform',
         'investment_status',
     ];
+
+    /**
+     * Relationships
+     */
+
+    public function payout(): BelongsTo
+    {
+        return $this->belongsTo(Payout::class);
+    }
 }
