@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::get('deals', [TransactionController::class, 'dealList']);
     Route::get('payouts', [TransactionController::class, 'payoutList']);
+    Route::get('payouts/{id}', [TransactionController::class, 'payoutDetail'])->where('id', '[0-9]+');
     Route::post('payouts', [TransactionController::class, 'payoutSave']);
 
 

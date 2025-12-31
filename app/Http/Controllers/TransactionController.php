@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DealResource;
 use App\Http\Resources\InvestorDetailResource;
 use App\Http\Resources\InvestorResource;
+use App\Http\Resources\PayoutDetailResource;
 use App\Http\Resources\PayoutResource;
 use App\Services\InvestorService;
 use App\Services\TransactionService;
@@ -36,17 +37,30 @@ class TransactionController extends Controller
 
     public function payoutList()
     {
-        $investors = $this->transactionService->getPayoutsPaginated();
+        $payouts = $this->transactionService->getPayoutsPaginated();
 
-        if ($investors->isEmpty()) {
+        if ($payouts->isEmpty()) {
             return $this->errorResponse(message: 'No transaction found.');
         }
 
         $data = [
-            'data' => PayoutResource::collection($investors->items()),
-            'per_page' => $investors->perPage(),
-            'total' => $investors->total()
+            'data' => PayoutResource::collection($payouts->items()),
+            'per_page' => $payouts->perPage(),
+            'total' => $payouts->total()
         ];
+
+        return $this->successResponse(message: 'Success! Transaction list.', data: $data);
+    }
+
+    public function payoutDetail(int $id)
+    {
+        $payout = $this->transactionService->getPayoutDetails($id);
+
+        if (!$payout) {
+            return $this->errorResponse(message: 'No transaction found.');
+        }
+
+        $data = new PayoutDetailResource($payout);
 
         return $this->successResponse(message: 'Success! Transaction list.', data: $data);
     }

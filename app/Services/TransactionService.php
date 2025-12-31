@@ -25,4 +25,9 @@ class TransactionService
             }
         })->paginate(20);
     }
+
+    public function getPayoutDetails($id)
+    {
+        return Payout::with(['transactions', 'campaign', 'user'])->findOrFail($id);
+    }
 }
